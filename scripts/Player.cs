@@ -7,18 +7,18 @@ using System.Reflection.Metadata;
 
 public partial class Player : CharacterBody3D
 {
-    public float playerSpeed = 3f;
+    public float Speed = 3f;
     public bool isRunning = false;
-    public const float playerRunSpeed = 5f;
-    public const float playerWalkSpeed = 3f;
+    public const float runSpeed = 5f;
+    public const float walkSpeed = 3f;
     public const float jumpVelocity = 3.5f;
     [Export]
     public float sensitivityHorizontal = 0.5f;
     [Export]
     public float sensitivityVertical = 0.5f;
-    public Node3D camera_mount_thirdperson;
-    public Node3D visuals;
-    public AnimationPlayer playerAnimator;
+    public Node3D cameraThirdPerson;
+    public Node3D Visuals;
+    public AnimationPlayer Animator;
 
     // Get the gravity from the project settings to be synced with RigidBody nodes.
     public float gravity = ProjectSettings.GetSetting("physics/3d/default_gravity").AsSingle();
@@ -26,9 +26,9 @@ public partial class Player : CharacterBody3D
     public override void _Ready()
     {
         Input.MouseMode = Input.MouseModeEnum.Captured;
-		camera_mount_thirdperson = GetNode<Node3D>("camera_mount_thirdperson");  
-		visuals = GetNode<Node3D>("visuals");  
-		playerAnimator = GetNode<AnimationPlayer>("visuals/alpha/AnimationPlayer");
+		cameraThirdPerson = GetNode<Node3D>("camera_mount_thirdperson");  
+		Visuals = GetNode<Node3D>("visuals");  
+		Animator = GetNode<AnimationPlayer>("visuals/alpha/AnimationPlayer");
     }
 
     public override void _Input(InputEvent @event)
@@ -36,8 +36,8 @@ public partial class Player : CharacterBody3D
         if (@event is InputEventMouseMotion mouseMotionEvent)
         {
             RotateY(Mathf.DegToRad(-mouseMotionEvent.Relative.X * sensitivityHorizontal));
-            camera_mount_thirdperson.RotateX(Mathf.DegToRad(-mouseMotionEvent.Relative.Y * sensitivityVertical));
-            visuals.RotateY(Mathf.DegToRad(mouseMotionEvent.Relative.X * sensitivityHorizontal));
+            cameraThirdPerson.RotateX(Mathf.DegToRad(-mouseMotionEvent.Relative.Y * sensitivityVertical));
+            Visuals.RotateY(Mathf.DegToRad(mouseMotionEvent.Relative.X * sensitivityHorizontal));
         }
     }
 
@@ -47,10 +47,10 @@ public partial class Player : CharacterBody3D
 
         switch (Input.IsActionPressed("sprint"))        
         {
-            case true:  playerSpeed = playerRunSpeed;
+            case true:  Speed = runSpeed;
                         isRunning = true;
                         break;
-            case false: playerSpeed = playerWalkSpeed;
+            case false: Speed = walkSpeed;
                         isRunning = false;
                         break;
         }    
@@ -71,22 +71,22 @@ public partial class Player : CharacterBody3D
         {
             switch(isRunning)
             {
-                case true:  if (playerAnimator.CurrentAnimation != "sprint") playerAnimator.Play("sprint");                            
+                case true:  if (Animator.CurrentAnimation != "sprint") Animator.Play("sprint");                            
                             break;
-                case false: if (playerAnimator.CurrentAnimation != "walk") playerAnimator.Play("walk");
+                case false: if (Animator.CurrentAnimation != "walk") Animator.Play("walk");
                             break;
             }
 
-            visuals.LookAt(GlobalPosition + direction);
-            velocity.X = direction.X * playerSpeed;
-            velocity.Z = direction.Z * playerSpeed;
+            Visuals.LookAt(GlobalPosition + direction);
+            velocity.X = direction.X * Speed;
+            velocity.Z = direction.Z * Speed;
         }
         else
         {
-            velocity.X = Mathf.MoveToward(Velocity.X, 0, playerSpeed);
-            velocity.Z = Mathf.MoveToward(Velocity.Z, 0, playerSpeed);
+            velocity.X = Mathf.MoveToward(Velocity.X, 0, Speed);
+            velocity.Z = Mathf.MoveToward(Velocity.Z, 0, Speed);
 
-            if (playerAnimator.CurrentAnimation != "idle") playerAnimator.Play("idle");                
+            if (Animator.CurrentAnimation != "idle") Animator.Play("idle");                
         }
 
         Velocity = velocity;

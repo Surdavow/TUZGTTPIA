@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": 
+    [
+        {
+            "name": "Debug",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "C:/Users/Elite PC/OneDrive/Productivity/Godot/Godot.exe",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopAtEntry": false,
+            "args": ["--path","${workspaceRoot}"]
+        }
+    ]
+}

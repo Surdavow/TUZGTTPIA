@@ -1,2 +1,2 @@
-#Godotification of TUBZGTTPIA
-That untitled Godot zombie game that takes place in America.
+# Godotofication of Dark Blockland Guard's TUBZGTTPIA
+That untitled (Blockland) zombie game that takes place in America.

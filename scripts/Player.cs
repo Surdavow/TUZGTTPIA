@@ -48,9 +48,23 @@ public partial class Player : CharacterBody3D
 
         if (!Animator.IsPlaying()) isLocked = false;
 
-        if (IsOnFloor() && Input.IsActionJustPressed("melee") && Animator.CurrentAnimation != "punching")
+        
+        if (IsOnFloor() && !isLocked && Input.IsActionJustPressed("melee"))
         {
-            Animator.Play("punching");
+            string randomAnimation = "punch_long";//Initialize this first
+            switch (GD.Randi() % 4)
+            {
+                case 1: randomAnimation = "punch_left";
+                        break;
+                case 2: randomAnimation = "punch_right";
+                        break;
+                case 3: randomAnimation = "punch_long";
+                        break;      
+                default: break;    
+            }            
+            
+            if (Animator.CurrentAnimation != randomAnimation) Animator.Play(randomAnimation);
+            
             isLocked = true;
         }
 

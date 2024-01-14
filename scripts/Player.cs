@@ -9,6 +9,7 @@ public partial class Player : CharacterBody3D
 {
     public float Speed = 3f;
     public bool isRunning = false;
+    public bool isLocked = false;
     public const float runSpeed = 5f;
     public const float walkSpeed = 3f;
     public const float jumpVelocity = 3.5f;
@@ -25,7 +26,7 @@ public partial class Player : CharacterBody3D
     
     public override void _Ready()
     {
-        Input.MouseMode = Input.MouseModeEnum.Captured;
+        Input.MouseMode = Input.MouseModeEnum.Captured;//Hide and lock the mouse
 		cameraThirdPerson = GetNode<Node3D>("camera_mount_thirdperson");  
 		Visuals = GetNode<Node3D>("visuals");  
 		Animator = GetNode<AnimationPlayer>("visuals/alpha/AnimationPlayer");
@@ -45,6 +46,14 @@ public partial class Player : CharacterBody3D
     {
         Vector3 velocity = Velocity;
 
+        if (!Animator.IsPlaying()) isLocked = false;
+
+        if (IsOnFloor() && Input.IsActionJustPressed("melee") && Animator.CurrentAnimation != "punching")
+        {
+            Animator.Play("punching");
+            isLocked = true;
+        }
+
         switch (Input.IsActionPressed("sprint"))        
         {
             case true:  Speed = runSpeed;
@@ -53,7 +62,7 @@ public partial class Player : CharacterBody3D
             case false: Speed = walkSpeed;
                         isRunning = false;
                         break;
-        }    
+        }
 
         // Add the gravity.
         if (!IsOnFloor())
@@ -67,17 +76,22 @@ public partial class Player : CharacterBody3D
         // As good practice, you should replace UI actions with custom gameplay actions.
         Vector2 inputDir = Input.GetVector("move left", "move right", "move forward", "move backward");
         Vector3 direction = (Transform.Basis * new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
+        
         if (direction != Vector3.Zero)
         {
-            switch(isRunning)
+            if (!isLocked)
             {
-                case true:  if (Animator.CurrentAnimation != "sprint") Animator.Play("sprint");                            
-                            break;
-                case false: if (Animator.CurrentAnimation != "walk") Animator.Play("walk");
-                            break;
+                switch(isRunning)
+                {
+                    case true:  if (Animator.CurrentAnimation != "sprint") Animator.Play("sprint");
+                                break;
+                    case false: if (Animator.CurrentAnimation != "walk") Animator.Play("walk");
+                                break;
+                }
+
+                Visuals.LookAt(GlobalPosition + direction);
             }
 
-            Visuals.LookAt(GlobalPosition + direction);
             velocity.X = direction.X * Speed;
             velocity.Z = direction.Z * Speed;
         }
@@ -86,10 +100,10 @@ public partial class Player : CharacterBody3D
             velocity.X = Mathf.MoveToward(Velocity.X, 0, Speed);
             velocity.Z = Mathf.MoveToward(Velocity.Z, 0, Speed);
 
-            if (Animator.CurrentAnimation != "idle") Animator.Play("idle");                
+            if (!isLocked && Animator.CurrentAnimation != "idle") Animator.Play("idle");                
         }
 
-        Velocity = velocity;
-        MoveAndSlide();
+        Velocity = velocity;            
+        if (!isLocked) MoveAndSlide();
     }
 }

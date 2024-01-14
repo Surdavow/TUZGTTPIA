@@ -8,18 +8,24 @@ using System.Reflection.Metadata;
 public partial class Player : CharacterBody3D
 {
     public float Speed = 3f;
-    public bool isRunning = false;
-    public bool isLocked = false;
-    public const float runSpeed = 5f;
-    public const float walkSpeed = 3f;
-    public const float jumpVelocity = 3.5f;
+    
+    [Export]
+    public float airControl = 0.1f;
+    [Export]
+    public float runSpeed = 5f;
+    [Export]
+    public float walkSpeed = 3f;
+    public float jumpVelocity = 3.5f;
     [Export]
     public float sensitivityHorizontal = 0.5f;
     [Export]
     public float sensitivityVertical = 0.5f;
+    public bool isRunning = false;
+    public bool isLocked = false;    
     public Node3D cameraThirdPerson;
     public Node3D Visuals;
     public AnimationPlayer Animator;
+    public AudioStreamPlayer3D soundPlayer;
 
     // Get the gravity from the project settings to be synced with RigidBody nodes.
     public float gravity = ProjectSettings.GetSetting("physics/3d/default_gravity").AsSingle();
@@ -27,9 +33,19 @@ public partial class Player : CharacterBody3D
     public override void _Ready()
     {
         Input.MouseMode = Input.MouseModeEnum.Captured;//Hide and lock the mouse
-		cameraThirdPerson = GetNode<Node3D>("camera_mount_thirdperson");  
-		Visuals = GetNode<Node3D>("visuals");  
-		Animator = GetNode<AnimationPlayer>("visuals/alpha/AnimationPlayer");
+		cameraThirdPerson = GetNode<Node3D>("cameraMountThirdPerson");  
+		//Visuals = GetNode<Node3D>("Visuals");
+		soundPlayer = GetNode<AudioStreamPlayer3D>("soundPlayer");
+		//Animator = GetNode<AnimationPlayer>("Visuals/alpha/AnimationPlayer");
+    }
+
+    public void playFootsteps()
+    {
+        if (IsOnFloor()) 
+        {
+            //if (isRunning) 
+            soundPlayer.Play();
+        }
     }
 
     public override void _Input(InputEvent @event)
@@ -37,36 +53,16 @@ public partial class Player : CharacterBody3D
         if (@event is InputEventMouseMotion mouseMotionEvent)
         {
             RotateY(Mathf.DegToRad(-mouseMotionEvent.Relative.X * sensitivityHorizontal));
-            cameraThirdPerson.RotateX(Mathf.DegToRad(-mouseMotionEvent.Relative.Y * sensitivityVertical));
-            Visuals.RotateY(Mathf.DegToRad(mouseMotionEvent.Relative.X * sensitivityHorizontal));
+            cameraThirdPerson.RotateX(Mathf.DegToRad(-mouseMotionEvent.Relative.Y * sensitivityVertical));            
         }
     }
 
     public override void _PhysicsProcess(double delta)
     {
-        Vector3 velocity = Velocity;
 
-        if (!Animator.IsPlaying()) isLocked = false;
-
-        
-        if (IsOnFloor() && !isLocked && Input.IsActionJustPressed("melee"))
-        {
-            string randomAnimation = "punch_long";//Initialize this first
-            switch (GD.Randi() % 4)
-            {
-                case 1: randomAnimation = "punch_left";
-                        break;
-                case 2: randomAnimation = "punch_right";
-                        break;
-                case 3: randomAnimation = "punch_long";
-                        break;      
-                default: break;    
-            }            
-            
-            if (Animator.CurrentAnimation != randomAnimation) Animator.Play(randomAnimation);
-            
-            isLocked = true;
-        }
+        Vector3 velocity = Velocity;        
+        // Add the gravity.
+        if (!IsOnFloor()) velocity.Y -= gravity * (float)delta;
 
         switch (Input.IsActionPressed("sprint"))        
         {
@@ -78,44 +74,23 @@ public partial class Player : CharacterBody3D
                         break;
         }
 
-        // Add the gravity.
-        if (!IsOnFloor())
-            velocity.Y -= gravity * (float)delta;
-
-        // Handle Jump.
-        if (Input.IsActionJustPressed("ui_accept") && IsOnFloor())
-            velocity.Y = jumpVelocity;
-
         // Get the input direction and handle the movement/deceleration.
-        // As good practice, you should replace UI actions with custom gameplay actions.
         Vector2 inputDir = Input.GetVector("move left", "move right", "move forward", "move backward");
-        Vector3 direction = (Transform.Basis * new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
+        Vector3 direction = (Transform.Basis * new Vector3(inputDir.X, 0, inputDir.Y)).Normalized(); 
         
         if (direction != Vector3.Zero)
         {
-            if (!isLocked)
-            {
-                switch(isRunning)
-                {
-                    case true:  if (Animator.CurrentAnimation != "sprint") Animator.Play("sprint");
-                                break;
-                    case false: if (Animator.CurrentAnimation != "walk") Animator.Play("walk");
-                                break;
-                }
-
-                Visuals.LookAt(GlobalPosition + direction);
-            }
-
-            velocity.X = direction.X * Speed;
-            velocity.Z = direction.Z * Speed;
+                velocity.X = direction.X * Speed;
+                velocity.Z = direction.Z * Speed;
         }
         else
         {
             velocity.X = Mathf.MoveToward(Velocity.X, 0, Speed);
-            velocity.Z = Mathf.MoveToward(Velocity.Z, 0, Speed);
-
-            if (!isLocked && Animator.CurrentAnimation != "idle") Animator.Play("idle");                
+            velocity.Z = Mathf.MoveToward(Velocity.Z, 0, Speed);           
         }
+
+        // Handle Jump.
+        if (Input.IsActionJustPressed("jump") && IsOnFloor()) velocity.Y = jumpVelocity;
 
         Velocity = velocity;            
         if (!isLocked) MoveAndSlide();

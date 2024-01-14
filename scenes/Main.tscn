@@ -10,17 +10,24 @@
 [ext_resource type="PackedScene" uid="uid://dl8aieroxhs4p" path="res://scenes/Player.tscn" id="8_y3c1v"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_guxnk"]
-sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+sky_top_color = Color(0.384314, 0.541176, 0.756863, 1)
+sky_horizon_color = Color(0.580392, 0.647059, 0.780392, 1)
+sky_curve = 0.075
 ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+sun_angle_max = 10.0
+sun_curve = 0.1
 
 [sub_resource type="Sky" id="Sky_yyhmn"]
 sky_material = SubResource("ProceduralSkyMaterial_guxnk")
+radiance_size = 4
 
 [sub_resource type="Environment" id="Environment_tcpy2"]
 background_mode = 2
-background_energy_multiplier = 2.0
+background_energy_multiplier = 1.5
 sky = SubResource("Sky_yyhmn")
-tonemap_mode = 2
+ambient_light_source = 3
+reflected_light_source = 2
+tonemap_mode = 3
 sdfgi_enabled = true
 sdfgi_use_occlusion = true
 glow_enabled = true
@@ -53,8 +60,13 @@ albedo_texture = ExtResource("6_u0k2b")
 [node name="Scene" type="Node3D"]
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-0.866023, -0.433016, 0.250001, 0, 0.499998, 0.866027, -0.500003, 0.749999, -0.43301, 0, 0, 0)
+transform = Transform3D(-1, 8.74228e-08, 0, -6.18172e-08, -0.707107, 0.707107, 6.18172e-08, 0.707107, 0.707107, 0, 0, 0)
 shadow_enabled = true
+shadow_bias = 0.05
+shadow_normal_bias = 0.5
+shadow_transmittance_bias = 1.0
+shadow_blur = 0.75
+directional_shadow_blend_splits = true
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_tcpy2")

@@ -141,3 +141,7 @@ use_collision = true
 metadata/_edit_lock_ = true
 
 [node name="Player" parent="." instance=ExtResource("8_y3c1v")]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4278, 2.23716)
+current = true

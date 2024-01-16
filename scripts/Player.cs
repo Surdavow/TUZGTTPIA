@@ -7,7 +7,7 @@ public partial class Player : CharacterBody3D
     [Export]
     public const float lerpSpeed = 0.15f;
     [Export]
-    public const float accelerationSpeed = 0.8f;
+    public const float accelerationSpeed = 0.5f;
     [Export]
     public const float airControl = 0.1f;
     [Export]
@@ -68,15 +68,11 @@ public partial class Player : CharacterBody3D
         {
             RotateY(Mathf.DegToRad(-mouseMotionEvent.Relative.X * sensitivityHorizontal));
             cameraThirdPerson.RotateX(Mathf.DegToRad(-mouseMotionEvent.Relative.Y * sensitivityVertical));
-            cameraThirdPerson.RotationDegrees = new Vector3(Math.Clamp(cameraThirdPerson.RotationDegrees.X,-90,100),-180,0);
+            cameraThirdPerson.RotationDegrees = new Vector3(Math.Clamp(cameraThirdPerson.RotationDegrees.X,-100,100),-180,0);
 
-            //float currentRotationX = cameraThirdPerson.RotationDegrees.X;
-            //float oldMin = -90;
-            //float oldMax = 100;
-            //float newMin = -1;
-            //float newMax = 1;
-            //float remappedValue;        
-            //AnimationTree.Set("parameters/LookAnims/blend_position", new Vector2(0, -1));
+            float currentRotationX = cameraThirdPerson.RotationDegrees.X;
+            float remappedValue = -1 + (currentRotationX - 100) * (1 - -1) / (-100 - 100);            
+            AnimationTree.Set("parameters/LookAnims/blend_position", new Vector2(0, remappedValue));
         }
     }
 
@@ -127,7 +123,7 @@ public partial class Player : CharacterBody3D
 
         if (direction != Vector3.Zero)
         {
-            if(-Transform.Basis.Z.Dot(Velocity) < 0) direction.Z *= currentSpeed*0.75f;            
+            if(-Transform.Basis.Z.Dot(Velocity) < 0) direction.Z *= currentSpeed*0.6f;            
             else direction.Z *= currentSpeed;
             
             direction.X *= currentSpeed;

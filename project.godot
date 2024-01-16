@@ -19,10 +19,6 @@ config/icon="res://icon.svg"
 
 driver/enable_input=true
 
-[display]
-
-window/size/mode=3
-
 [dotnet]
 
 project/assembly_name="Tuzgttpia"

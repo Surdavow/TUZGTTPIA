@@ -56,7 +56,7 @@ public partial class Player : CharacterBody3D
     public override void _Input(InputEvent @event)
     {
         
-        if(Input.IsActionJustPressed("melee"))
+        if (Input.IsActionJustPressed("melee"))
         {
             Random rand = new Random();            
             AnimationNodeStateMachinePlayback stateMachine = (AnimationNodeStateMachinePlayback)AnimationTree.Get("parameters/Upper Anims States/playback");
@@ -69,6 +69,14 @@ public partial class Player : CharacterBody3D
             RotateY(Mathf.DegToRad(-mouseMotionEvent.Relative.X * sensitivityHorizontal));
             cameraThirdPerson.RotateX(Mathf.DegToRad(-mouseMotionEvent.Relative.Y * sensitivityVertical));
             cameraThirdPerson.RotationDegrees = new Vector3(Math.Clamp(cameraThirdPerson.RotationDegrees.X,-90,100),-180,0);
+
+            //float currentRotationX = cameraThirdPerson.RotationDegrees.X;
+            //float oldMin = -90;
+            //float oldMax = 100;
+            //float newMin = -1;
+            //float newMax = 1;
+            //float remappedValue;        
+            //AnimationTree.Set("parameters/LookAnims/blend_position", new Vector2(0, -1));
         }
     }
 
@@ -76,14 +84,13 @@ public partial class Player : CharacterBody3D
 
     public override void _UnhandledInput(InputEvent @event)
     {
-        if (@event is InputEventKey eventKey && eventKey.Pressed && eventKey.Keycode == Key.Escape)
-        GetTree().Quit();
+        if (@event is InputEventKey eventKey && eventKey.Pressed && eventKey.Keycode == Key.Escape) GetTree().Quit();
     }
 
     public override void _PhysicsProcess(double delta)
     {
         AnimationNodeStateMachinePlayback stateMachine = (AnimationNodeStateMachinePlayback)AnimationTree.Get("parameters/Main States/playback");
-        Vector3 velocity = Velocity;                
+        Vector3 velocity = Velocity;
 
         if (Input.IsActionJustPressed("jump") && IsOnFloor()) 
         {
@@ -160,7 +167,7 @@ public partial class Player : CharacterBody3D
         else
         {            
             AnimationTree.Set("parameters/Main States/conditions/isGrounded",false);            
-            if(velocity.Y < 0) 
+            if (velocity.Y < 0) 
             {
                 AnimationTree.Set("parameters/Main States/conditions/isFalling",true);
                 AnimationTree.Set("parameters/Main States/conditions/isJumping",false);

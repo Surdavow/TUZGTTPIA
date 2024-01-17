@@ -5,35 +5,33 @@ using System;
 public partial class Player : CharacterBody3D
 {
     [Export]
-    public const float lerpSpeed = 0.15f;
-    [Export]
-    public const float accelerationSpeed = 0.5f;
-    [Export]
-    public const float airControl = 0.1f;
-    [Export]
-    public const float walkSpeed = 2f;    
+    public float moveMultiplier = 1;
     [Export]    
-    public const float runSpeed = 4f;    
+    public bool canJump;     
+    [Export]    
+    public float Mass = 25;    
     [Export]
-    public const float jumpVelocity = 6f;
+    public const float jumpForce = 10;
     [Export]
-    public const float sensitivityHorizontal = 0.5f;
+    public float sensitivityHorizontal = 0.5f;
     [Export]
-    public const float sensitivityVertical = 0.5f;
+    public float sensitivityVertical = 0.5f;
 
-    public float currentSpeed = 0;
+    public const float accelerationSpeed = 0.4f;    
+    public const float airControl = 0.1f;
+    public const float walkSpeed = 2;
+    public const float runSpeed = 4;    
+    public const float lerpSpeed = 0.15f;
+    public float currentSpeed;
     public bool isRunning = false;
     public bool isLocked = false;    
     public Node3D cameraThirdPerson;
     public Node3D Character;
+    public Node3D CharacterLookNode;
     public AnimationTree AnimationTree;
     public AudioStreamPlayer3D soundPlayer;
-    public bool superRun = false;
-    public bool lastFloor = true;
-    public float runMultiplier = 1;
+    public bool superRun = false;    
     public string[] punchAnimations = {"punch1", "punch2","punch3"};
-
-    // Get the gravity from the project settings to be synced with RigidBody nodes.
     public float gravity = ProjectSettings.GetSetting("physics/3d/default_gravity").AsSingle();
     
     public override void _Ready()
@@ -41,17 +39,14 @@ public partial class Player : CharacterBody3D
         Input.MouseMode = Input.MouseModeEnum.Captured;//Hide and lock the mouse
 		cameraThirdPerson = GetNode<Node3D>("CameraMountThirdPerson");  
 		Character = GetNode<Node3D>("character_default");
+		CharacterLookNode = GetNode<Node3D>("character_default/default_rig/Skeleton3D/BoneAttachment3D/CharacterLookNode");
 		soundPlayer = GetNode<AudioStreamPlayer3D>("SoundPlayer3D");
 		AnimationTree = GetNode<AnimationTree>("character_default/AnimationTree");
-    }
-
-    public void playFootsteps()
-    {
-        if (IsOnFloor()) 
-        {
-            //if (isRunning) 
-            soundPlayer.Play();
-        }
+        AnimationTree.Set("parameters/Main States/conditions/isGrounded",true);
+        AnimationTree.Set("parameters/Main States/conditions/isJumping",false);
+        AnimationTree.Set("parameters/Main States/conditions/isFalling",false);
+        canJump = true;
+        currentSpeed = 0;
     }
     public override void _Input(InputEvent @event)
     {
@@ -62,7 +57,7 @@ public partial class Player : CharacterBody3D
             AnimationNodeStateMachinePlayback stateMachine = (AnimationNodeStateMachinePlayback)AnimationTree.Get("parameters/Upper Anims States/playback");
             string randomPunchAnimation = punchAnimations[rand.Next(punchAnimations.Length)];
             stateMachine.Travel(randomPunchAnimation);
-        } 
+        }    
 
         if (@event is InputEventMouseMotion mouseMotionEvent)
         {
@@ -71,7 +66,7 @@ public partial class Player : CharacterBody3D
             cameraThirdPerson.RotationDegrees = new Vector3(Math.Clamp(cameraThirdPerson.RotationDegrees.X,-100,100),-180,0);
 
             float currentRotationX = cameraThirdPerson.RotationDegrees.X;
-            float remappedValue = -1 + (currentRotationX - 100) * (1 - -1) / (-100 - 100);            
+            float remappedValue = -1 + (currentRotationX - 100) * (1 - -1) / (-100 - 100);          
             AnimationTree.Set("parameters/LookAnims/blend_position", new Vector2(0, remappedValue));
         }
     }
@@ -83,15 +78,32 @@ public partial class Player : CharacterBody3D
         if (@event is InputEventKey eventKey && eventKey.Pressed && eventKey.Keycode == Key.Escape) GetTree().Quit();
     }
 
+    public void jumpFunction()
+    {
+        Vector3 velocity = Velocity;
+        velocity.Y = Mathf.Lerp(velocity.Y,jumpForce,0.8f);
+        Velocity = velocity;
+        MoveAndSlide();
+    }
+    public void playFootsteps()
+    {
+        if (IsOnFloor()) 
+        {
+            //if (isRunning) 
+            soundPlayer.Play();
+        }
+    }
+
     public override void _PhysicsProcess(double delta)
     {
         AnimationNodeStateMachinePlayback stateMachine = (AnimationNodeStateMachinePlayback)AnimationTree.Get("parameters/Main States/playback");
         Vector3 velocity = Velocity;
 
-        if (Input.IsActionJustPressed("jump") && IsOnFloor()) 
+        if (Input.IsActionJustPressed("jump") && IsOnFloor() && canJump) 
         {
-            velocity.Y = jumpVelocity;
             AnimationTree.Set("parameters/Main States/conditions/isJumping",true);
+            AnimationTree.Set("parameters/Main States/conditions/isFalling",false);
+            AnimationTree.Set("parameters/Main States/conditions/isGrounded",false);
         }        
 
         if(Input.IsActionJustPressed("interact"))
@@ -99,10 +111,10 @@ public partial class Player : CharacterBody3D
             switch(superRun)
             {
                 case true: superRun = false;
-                            runMultiplier = 1;
+                            moveMultiplier = 1;
                             break;                
                 case false: superRun = true;
-                            runMultiplier = 2.5f;
+                            moveMultiplier = 2.5f;
                             break;
             }            
         }           
@@ -110,7 +122,7 @@ public partial class Player : CharacterBody3D
         //Lerp the speed slowly to accomodate run acceleration, and set isRunning to true
         switch (Input.IsActionPressed("sprint"))        
         {
-            case true:  currentSpeed = Mathf.Lerp(currentSpeed,runSpeed*runMultiplier,lerpSpeed*0.15f);
+            case true:  currentSpeed = Mathf.Lerp(currentSpeed,runSpeed*moveMultiplier,lerpSpeed*0.15f);
                         isRunning = true;
                         break;
             case false: currentSpeed = Mathf.Lerp(currentSpeed,walkSpeed,lerpSpeed*0.75f);
@@ -123,7 +135,7 @@ public partial class Player : CharacterBody3D
 
         if (direction != Vector3.Zero)
         {
-            if(-Transform.Basis.Z.Dot(Velocity) < 0) direction.Z *= currentSpeed*0.6f;            
+            if(-Transform.Basis.Z.Dot(Velocity) < 0)  direction.Z *= currentSpeed*0.75f;
             else direction.Z *= currentSpeed;
             
             direction.X *= currentSpeed;
@@ -136,7 +148,8 @@ public partial class Player : CharacterBody3D
 
         velocity.X = Mathf.Lerp(velocity.X,direction.X,lerpSpeed * accelerationSpeed);
         velocity.Z = Mathf.Lerp(velocity.Z,direction.Z,lerpSpeed * accelerationSpeed);
-        if (!IsOnFloor()) velocity.Y -= gravity * (float)delta*2f;
+        
+        if (!IsOnFloor()) velocity.Y -= gravity * (float)delta*(Mass/gravity);
 
         float LongSpeed = -Transform.Basis.Z.Dot(Velocity);
         float LatSpeed = Transform.Basis.X.Dot(Velocity);
@@ -144,34 +157,29 @@ public partial class Player : CharacterBody3D
 
         float LocmotionBlendX = AnimationTree.Get("parameters/Main States/Locomotion/blend_position").AsVector2().X;
         float LocmotionBlendY = AnimationTree.Get("parameters/Main States/Locomotion/blend_position").AsVector2().Y;
-        bool LocmotionIsJumping = (bool)AnimationTree.Get("parameters/Main States/conditions/isGrounded");
+        bool LocmotionIsJumping = (bool)AnimationTree.Get("parameters/Main States/conditions/isJumping");
         float LocmotionSpeedScale = (float)AnimationTree.Get("parameters/TimeScale/scale");
         AnimationTree.Set("parameters/Main States/Locomotion/blend_position", new Vector2(Math.Clamp(Mathf.Lerp(LocmotionBlendX,LatSpeed / runSpeed,0.25f),-1,1),Math.Clamp(Mathf.Lerp(LocmotionBlendY,LongSpeed / runSpeed,0.25f),-1,1)));
 
-        if (IsOnFloor()) AnimationTree.Set("parameters/TimeScale/scale",Mathf.Lerp(LocmotionSpeedScale,Math.Clamp(LatLongSpeed/runSpeed, 1, 1000),lerpSpeed));
-        else if (!LocmotionIsJumping) AnimationTree.Set("parameters/TimeScale/scale",Mathf.Lerp(LocmotionSpeedScale,1,0.5f));
+        //Vector3 normalizedLook = (GlobalPosition - CharacterLookNode.GlobalPosition).Normalized();
+        //float lookDotProduct = -Transform.Basis.Z.Dot(normalizedLook);
+        //AnimationTree.Set("parameters/LookAnims/blend_position", new Vector2(Mathf.Lerp(AnimationTree.Get("parameters/LookAnims/blend_position").AsVector2().Y,lookDotProduct,2), AnimationTree.Get("parameters/LookAnims/blend_position").AsVector2().Y));        
+
+        if (IsOnFloor()) AnimationTree.Set("parameters/TimeScale/scale",Mathf.Lerp(LocmotionSpeedScale,Math.Clamp(LatLongSpeed / runSpeed, 1, 1000),lerpSpeed));
+        else if (LocmotionIsJumping) AnimationTree.Set("parameters/TimeScale/scale",Mathf.Lerp(LocmotionSpeedScale,1,1.25f));
 
         Velocity = velocity;
-        MoveAndSlide();        
+        MoveAndSlide();
 
         if (IsOnFloor()) 
         {
-            AnimationTree.Set("parameters/Main States/conditions/isJumping",false);
-            AnimationTree.Set("parameters/Main States/conditions/isFalling",false);
             AnimationTree.Set("parameters/Main States/conditions/isGrounded",true);
+            AnimationTree.Set("parameters/Main States/conditions/isFalling",false); 
         }
         else
         {            
-            AnimationTree.Set("parameters/Main States/conditions/isGrounded",false);            
-            if (velocity.Y < 0) 
-            {
-                AnimationTree.Set("parameters/Main States/conditions/isFalling",true);
-                AnimationTree.Set("parameters/Main States/conditions/isJumping",false);
-            }
-            else
-            {
-                AnimationTree.Set("parameters/Main States/conditions/isFalling",false);
-            }
+            AnimationTree.Set("parameters/Main States/conditions/isGrounded",false);                        
+            if (velocity.Y <= 0) AnimationTree.Set("parameters/Main States/conditions/isFalling",true);            
         }
     }
 }

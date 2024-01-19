@@ -12,20 +12,19 @@ public partial class Player : CharacterBody3D
     [Export]
     public float jumpForce = 10;
     [Export]
-    public float moveForce = 0.25f;        
+    public float moveForce = 0.5f;        
     [Export]
     public float mouseSensitivity = 1;
     [Export]
     public float airControl = 0.8f;    
-    private const float walkSpeed = 1.5f;
-    private const float runSpeed = 4.5f;
+    private const float walkSpeed = 2;
+    private const float runSpeed = 4;
     private const float lerpSpeed = 0.15f;
     private float currentSpeed;
     private bool isRunning = false;
     private bool isLocked = false;    
     private Node3D cameraThirdPerson;
     private Node3D Character;
-    private Node3D CharacterLookNode;
     private AnimationTree AnimationTree;
     private Skeleton3D CharacterSkeleton;
     private AudioStreamPlayer3D soundPlayer;
@@ -38,7 +37,6 @@ public partial class Player : CharacterBody3D
         Input.MouseMode = Input.MouseModeEnum.Captured;//Hide and lock the mouse
 		cameraThirdPerson = GetNode<Node3D>("CameraMountThirdPerson");  
 		Character = GetNode<Node3D>("character_default");
-		CharacterLookNode = GetNode<Node3D>("character_default/default_rig/Skeleton3D/BoneAttachment3D/CharacterLookNode");
 		soundPlayer = GetNode<AudioStreamPlayer3D>("SoundPlayer3D");
 		AnimationTree = GetNode<AnimationTree>("character_default/AnimationTree");
 		CharacterSkeleton = GetNode<Skeleton3D>("character_default/default_rig/Skeleton3D");
@@ -95,8 +93,10 @@ public partial class Player : CharacterBody3D
 
         Quaternion headBoneQuaternion = CharacterSkeleton.GetBonePoseRotation(5);
         Quaternion neckBoneQuaternion = CharacterSkeleton.GetBonePoseRotation(4);
+        Quaternion spine2BoneQuaternion = CharacterSkeleton.GetBonePoseRotation(3);
         CharacterSkeleton.SetBonePoseRotation(5, new Quaternion(-cameraThirdPerson.Rotation.X*0.25f, headBoneQuaternion.Y, headBoneQuaternion.Z, headBoneQuaternion.W));        
         CharacterSkeleton.SetBonePoseRotation(4, new Quaternion(-cameraThirdPerson.Rotation.X*0.1f, neckBoneQuaternion.Y, neckBoneQuaternion.Z, neckBoneQuaternion.W));
+        CharacterSkeleton.SetBonePoseRotation(3, new Quaternion(-cameraThirdPerson.Rotation.X*0.1f, neckBoneQuaternion.Y, neckBoneQuaternion.Z, neckBoneQuaternion.W));
 
         //Lerp the speed slowly to accomodate run acceleration, and set isRunning to true
         switch (Input.IsActionPressed("sprint"))        
@@ -147,7 +147,7 @@ public partial class Player : CharacterBody3D
 
         
         if (IsOnFloor()) AnimationTree.Set("parameters/TimeScale/scale",Mathf.Lerp(LocomotionSpeedScale,Math.Clamp(LatLongSpeed / currentSpeed, 1, 1000),lerpSpeed));
-        else AnimationTree.Set("parameters/TimeScale/scale",Mathf.Lerp(LocomotionSpeedScale,1,1.25f));      
+        else AnimationTree.Set("parameters/TimeScale/scale",Mathf.Lerp(LocomotionSpeedScale,1,1.25f));
 
         Velocity = velocity;
         MoveAndSlide();

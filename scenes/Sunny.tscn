@@ -32,7 +32,7 @@ sdfgi_cascades = 8
 sdfgi_energy = 1.5
 glow_enabled = true
 fog_enabled = true
-fog_light_color = Color(0.380392, 0.501961, 0.611765, 1)
+fog_light_color = Color(0.494118, 0.556863, 0.611765, 1)
 fog_light_energy = 2.5
 fog_sky_affect = 0.25
 

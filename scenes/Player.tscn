@@ -1,16 +1,11 @@
-[gd_scene load_steps=54 format=3 uid="uid://dl8aieroxhs4p"]
+[gd_scene load_steps=48 format=3 uid="uid://dl8aieroxhs4p"]
 
 [ext_resource type="Script" path="res://scripts/Player.cs" id="1_3xn0t"]
 [ext_resource type="PackedScene" uid="uid://ct0vdg7drup5y" path="res://assets/models/character_default.glb" id="2_o11wm"]
-[ext_resource type="AudioStream" uid="uid://d1uikjs1ps0my" path="res://assets/audio/footsteps/rubber_03.wav" id="2_ulng7"]
-[ext_resource type="AudioStream" uid="uid://dvyahtj4gnmdc" path="res://assets/audio/footsteps/rubber_04.wav" id="3_4asll"]
 [ext_resource type="Animation" uid="uid://dfyf34w4xcbwu" path="res://assets/models/res/idle_happy.res" id="3_87oo2"]
 [ext_resource type="Animation" uid="uid://0n3nqxes8nxg" path="res://assets/models/res/default.res" id="3_o32pt"]
 [ext_resource type="Animation" uid="uid://dhdoe2a7jbppk" path="res://assets/models/res/fall_idle1.res" id="4_4baeu"]
-[ext_resource type="AudioStream" uid="uid://c5nt0rb75b1hy" path="res://assets/audio/footsteps/rubber_05.wav" id="4_mkina"]
-[ext_resource type="AudioStream" uid="uid://c04qlb6mpnto0" path="res://assets/audio/footsteps/rubber_06.wav" id="5_8ahj2"]
 [ext_resource type="Animation" uid="uid://dklx5x8tpicl8" path="res://assets/models/res/fall_idle2.res" id="5_w8gfn"]
-[ext_resource type="AudioStream" uid="uid://80y6aaqnl42n" path="res://assets/audio/footsteps/rubber_07.wav" id="6_6nhui"]
 [ext_resource type="Animation" uid="uid://dj41v1jmewyki" path="res://assets/models/res/fall_land.res" id="6_k5juc"]
 [ext_resource type="Animation" uid="uid://c55thodsdw11j" path="res://assets/models/res/idle.res" id="7_4frb8"]
 [ext_resource type="Animation" uid="uid://s3j262b4cwvf" path="res://assets/models/res/jump.res" id="8_7vam4"]
@@ -29,20 +24,6 @@
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ysdxm"]
 radius = 0.35
 height = 1.8
-
-[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_a3hhe"]
-random_pitch = 2.0
-streams_count = 5
-stream_0/stream = ExtResource("2_ulng7")
-stream_0/weight = 1.0
-stream_1/stream = ExtResource("3_4asll")
-stream_1/weight = 1.0
-stream_2/stream = ExtResource("4_mkina")
-stream_2/weight = 1.0
-stream_3/stream = ExtResource("5_8ahj2")
-stream_3/weight = 1.0
-stream_4/stream = ExtResource("6_6nhui")
-stream_4/weight = 1.0
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_e04qa"]
 _data = {
@@ -158,13 +139,11 @@ point_count = 3
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_nw5nn"]
 xfade_time = 0.15
 xfade_curve = SubResource("Curve_t6125")
-switch_mode = 1
 advance_mode = 2
 advance_condition = &"isGrounded"
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_37eb0"]
-xfade_time = 0.38
-switch_mode = 1
+xfade_time = 0.25
 advance_mode = 2
 advance_condition = &"isFalling"
 
@@ -189,7 +168,6 @@ graph_offset = Vector2(-172, -191)
 [sub_resource type="AnimationNodeTimeScale" id="AnimationNodeTimeScale_gqgla"]
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_kfu2t"]
-graph_offset = Vector2(-345.22, 70.32)
 nodes/MainStates/node = SubResource("AnimationNodeStateMachine_lchy2")
 nodes/MainStates/position = Vector2(60, 180)
 nodes/TimeScale/node = SubResource("AnimationNodeTimeScale_gqgla")
@@ -212,7 +190,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.325, 1.65, 0)
 [node name="SpringArm3D" type="SpringArm3D" parent="CameraMountThirdPerson"]
 transform = Transform3D(1, 0, 0, 0, 0.999996, 0, 0, 0, 0.999999, 0, 0, 0)
 spring_length = 0.6
-margin = 0.25
 
 [node name="Camera3D" type="Camera3D" parent="CameraMountThirdPerson/SpringArm3D"]
 transform = Transform3D(1, -3.84859e-11, -2.33968e-10, 3.84861e-11, 1, -4.97779e-20, 2.33968e-10, 4.07733e-20, 1, 0, 0, 0)
@@ -226,10 +203,7 @@ transform = Transform3D(1, 0, 0, -6.70556e-23, 1, 1.05879e-22, 0, 0, 1, 0, 0, -2
 [node name="SoundPlayer3D" type="AudioStreamPlayer3D" parent="."]
 
 [node name="SoundPlayerFootsteps3D" type="AudioStreamPlayer3D" parent="."]
-stream = SubResource("AudioStreamRandomizer_a3hhe")
 unit_size = 0.5
-max_db = 1.0
-doppler_tracking = 2
 
 [node name="character_default" parent="." instance=ExtResource("2_o11wm")]
 
@@ -238,21 +212,21 @@ process_thread_group = 1
 process_thread_group_order = 0
 process_thread_messages = 2
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
-bones/0/position = Vector3(-0.00267047, 0.989775, 0.00450041)
-bones/0/rotation = Quaternion(-0.0337401, -0.0461621, -0.0258602, 0.998029)
-bones/1/rotation = Quaternion(-0.0282458, 0.0149612, 0.0248584, 0.99918)
-bones/2/rotation = Quaternion(0.0103517, 0.0021864, 0.0143655, 0.999841)
-bones/3/rotation = Quaternion(0.0676105, 0.00332367, 0.0142814, 0.997604)
+bones/0/position = Vector3(-0.00265917, 0.990321, 0.00592138)
+bones/0/rotation = Quaternion(-0.033958, -0.0454126, -0.0248012, 0.998083)
+bones/1/rotation = Quaternion(-0.034094, 0.01258, 0.0236549, 0.999059)
+bones/2/rotation = Quaternion(0.00959607, 0.0015659, 0.0142313, 0.999851)
+bones/3/rotation = Quaternion(0.0671373, 0.0029147, 0.0144598, 0.997635)
 bones/3/scale = Vector3(1, 1, 1)
-bones/4/rotation = Quaternion(0.0532205, -0.00209727, 0.00311097, 0.998576)
-bones/5/rotation = Quaternion(-0.0740651, 0.00697739, -0.00151355, 0.997228)
-bones/6/rotation = Quaternion(-0.599766, -0.432971, 0.50825, -0.441021)
+bones/4/rotation = Quaternion(0.04905, -0.00149788, 0.00476797, 0.998784)
+bones/5/rotation = Quaternion(-0.0677518, 0.0114888, -0.00195887, 0.997634)
+bones/6/rotation = Quaternion(-0.593419, -0.439751, 0.509052, -0.441971)
 bones/6/scale = Vector3(1, 1, 1)
-bones/7/rotation = Quaternion(0.543156, 0.179214, 0.205874, 0.794028)
+bones/7/rotation = Quaternion(0.549267, 0.183176, 0.203752, 0.789453)
 bones/7/scale = Vector3(1, 1, 1)
 bones/8/position = Vector3(2.79688e-08, 0.274047, -7.50351e-08)
-bones/8/rotation = Quaternion(-8.27971e-08, 6.79086e-07, 0.0135431, 0.999908)
-bones/9/rotation = Quaternion(0.0461018, -0.284398, 0.0278003, 0.957194)
+bones/8/rotation = Quaternion(-8.27753e-08, 6.78762e-07, 0.0145454, 0.999894)
+bones/9/rotation = Quaternion(0.0491791, -0.278897, 0.0260048, 0.958708)
 bones/10/rotation = Quaternion(0.209861, -0.0595621, 0.207505, 0.9536)
 bones/10/scale = Vector3(1, 1, 1)
 bones/11/rotation = Quaternion(-0.142713, 0.086596, -0.240535, 0.956178)
@@ -271,11 +245,11 @@ bones/22/scale = Vector3(1, 1, 1)
 bones/23/rotation = Quaternion(0.151257, -1.74444e-07, -0.0155005, 0.988373)
 bones/23/scale = Vector3(1, 1, 1)
 bones/24/rotation = Quaternion(0.143499, 3.71795e-08, -0.0147052, 0.989541)
-bones/25/rotation = Quaternion(0.604184, -0.430211, 0.522885, 0.420085)
+bones/25/rotation = Quaternion(0.599995, -0.434886, 0.525361, 0.418182)
 bones/25/scale = Vector3(1, 1, 1)
-bones/26/rotation = Quaternion(0.463176, -0.26483, -0.228577, 0.814301)
-bones/27/rotation = Quaternion(-8.25478e-08, -3.68141e-07, -0.0578282, 0.998327)
-bones/28/rotation = Quaternion(0.0545538, 0.177672, -0.0038106, 0.982569)
+bones/26/rotation = Quaternion(0.461993, -0.266619, -0.231355, 0.813604)
+bones/27/rotation = Quaternion(-8.92186e-08, -3.55744e-07, -0.0575334, 0.998344)
+bones/28/rotation = Quaternion(0.0552888, 0.174889, -0.00431198, 0.983025)
 bones/29/rotation = Quaternion(0.213785, 0.0653725, -0.225648, 0.948212)
 bones/30/rotation = Quaternion(-0.1441, -0.0761707, 0.277208, 0.946884)
 bones/31/rotation = Quaternion(-0.1552, 0.0746789, -0.0260452, 0.984712)
@@ -291,30 +265,36 @@ bones/40/rotation = Quaternion(0.155511, -1.11966e-08, 0.0126684, 0.987753)
 bones/41/rotation = Quaternion(0.228494, 0.0034029, 0.0429809, 0.97259)
 bones/42/rotation = Quaternion(0.151547, 1.38927e-07, 0.0123456, 0.988373)
 bones/43/rotation = Quaternion(0.143774, 1.98821e-08, 0.0117121, 0.989541)
-bones/44/rotation = Quaternion(0.13131, 0.0698773, 0.984477, -0.0931709)
+bones/44/rotation = Quaternion(0.129205, 0.0662139, 0.985157, -0.0915802)
 bones/44/scale = Vector3(1, 1, 1)
-bones/45/rotation = Quaternion(-0.13284, -1.35002e-06, -1.86525e-07, 0.991137)
-bones/46/rotation = Quaternion(0.536374, -0.031625, -0.00649222, 0.843363)
+bones/45/rotation = Quaternion(-0.128143, -1.33595e-06, -1.93886e-07, 0.991756)
+bones/46/rotation = Quaternion(0.534871, -0.0335349, -0.00564405, 0.844249)
 bones/46/scale = Vector3(1, 1, 1)
 bones/47/rotation = Quaternion(0.269319, -0.0323767, -0.0145899, 0.962396)
-bones/48/rotation = Quaternion(-0.121977, -0.0206252, 0.992239, -0.0125627)
+bones/48/rotation = Quaternion(-0.122963, -0.0237952, 0.992059, -0.0115009)
 bones/48/scale = Vector3(1, 1, 1)
-bones/49/rotation = Quaternion(-0.0847321, 9.81003e-07, 1.00822e-07, 0.996404)
-bones/50/rotation = Quaternion(0.572536, 0.0488613, -0.0488711, 0.816962)
+bones/49/rotation = Quaternion(-0.0784985, 9.93547e-07, 9.34633e-08, 0.996914)
+bones/50/rotation = Quaternion(0.570829, 0.0480775, -0.0482499, 0.818239)
 bones/50/scale = Vector3(1, 1, 1)
-bones/51/rotation = Quaternion(0.287328, 0.0318995, 0.0141138, 0.957197)
+bones/51/rotation = Quaternion(0.286132, 0.0319051, 0.0141374, 0.957554)
 bones/51/scale = Vector3(1, 1, 1)
 
 [node name="BoneAttachment3D" type="BoneAttachment3D" parent="character_default/default_rig/Skeleton3D" index="2"]
-transform = Transform3D(0.997712, -0.0577485, -0.0351654, 0.0581886, 0.998238, 0.0116246, 0.0344321, -0.0136442, 0.999314, -0.0146136, 1.58555, 0.0149942)
+transform = Transform3D(0.997784, -0.0597174, -0.0293411, 0.0604687, 0.997846, 0.0254238, 0.0277597, -0.0271417, 0.999246, -0.0148994, 1.5869, 0.00754302)
 bone_name = "mixamorig_Head"
 bone_idx = 5
 
 [node name="crosshairLight" type="SpotLight3D" parent="character_default/default_rig/Skeleton3D/BoneAttachment3D"]
 transform = Transform3D(-0.99749, -0.0607469, 0.0363836, -0.0615325, 0.997887, -0.0208738, -0.0350387, -0.0230602, -0.99912, 0.00499563, 0.0946062, 0.194948)
 light_energy = 25.0
-shadow_enabled = true
 spot_angle = 1.0
+
+[node name="flashLight" type="SpotLight3D" parent="character_default/default_rig/Skeleton3D/BoneAttachment3D"]
+transform = Transform3D(-0.99749, -0.0607469, 0.0363836, -0.0615325, 0.997887, -0.0208738, -0.0350387, -0.0230602, -0.99912, 0.00499563, 0.0946062, 0.194948)
+light_energy = 10.0
+light_specular = 1.0
+shadow_enabled = true
+spot_angle = 30.0
 
 [node name="AnimationPlayer" parent="character_default" index="1"]
 deterministic = true

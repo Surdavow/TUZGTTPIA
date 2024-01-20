@@ -132,11 +132,9 @@ public partial class Player : CharacterBody3D
     {        
         //Vector2 inputDir = Input.GetVector("move left", "move right", "move forward", "move backward");
         //Vector3 direction = (Transform.Basis * new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
-
-        //float targetAngle = 0;
-        //if(isRunning) targetAngle = (float)Math.Atan2(direction.X, direction.Z);
-        //float clampedTargetAngle = Mathf.Clamp(targetAngle, -0.25f, 0.25f);
-        //Character.Rotation = new Vector3(Character.Rotation.X, Mathf.LerpAngle(Character.Rotation.Y, clampedTargetAngle, 0.05f), Character.Rotation.Z);
+        //float targetAngle = Mathf.Clamp((float)Math.Atan2(direction.X, -direction.Z), -0.6f, 0.6f);
+        //if(!isRunning) targetAngle = 0;
+        //Character.Rotation = new Vector3(Character.Rotation.X, Mathf.LerpAngle(Character.Rotation.Y, targetAngle, 0.1f), Character.Rotation.Z);
 
         float LongSpeed = -Transform.Basis.Z.Dot(Velocity);
         float LatSpeed = Transform.Basis.X.Dot(Velocity);

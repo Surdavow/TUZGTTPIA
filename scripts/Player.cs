@@ -5,16 +5,20 @@ using System.Security.Cryptography.X509Certificates;
 
 public partial class Player : CharacterBody3D
 {
+    [Export]
+    public float mouseSensitivity = 1;
+    [Export]
+    public float FOV = 90;
+    [Export]
+    public float zoomFOV = 65;    
     [Export]    
-    public bool canJump;     
-    [Export]    
-    public float Mass = 25;    
+    public bool canJump;
     [Export]
     public float jumpForce = 10;
     [Export]
-    public float runForce = 0.25f;        
+    public float Mass = 25;
     [Export]
-    public float mouseSensitivity = 1;
+    public float runForce = 0.25f;    
     [Export]
     public float airControl = 0.8f;    
     private const float walkSpeed = 2;
@@ -25,14 +29,21 @@ public partial class Player : CharacterBody3D
     private bool isRunning = false;
     private bool isLocked = false;
     private bool isGrounded = true;
+    private bool isAiming = false;
     private Vector3 previousVelocity = new Vector3();
-    private Node3D cameraThirdPerson;
+    private SpotLight3D flashLight;
+    private SpotLight3D crosshairLight;
+    private Node3D cameraThirdPersonMount3D;
+    private Camera3D CameraThirdPerson3D;
+    private Camera3D CameraFirstPerson3D;
     private Node3D Character;
-    private AnimationTree AnimationTree;
     private Skeleton3D CharacterSkeleton;
+    private AnimationTree AnimationTree;    
     private AudioStreamPlayer3D soundPlayerFootsteps;
     private AudioStreamPlayer3D soundPlayer;
     private string[] punchAnimations = {"punch1", "punch2","punch3"};
+    private AudioStream flashlightOnSound = (AudioStream)ResourceLoader.Load("res://assets/audio/foley/flashlight_on.wav");
+    private AudioStream flashlightOffSound = (AudioStream)ResourceLoader.Load("res://assets/audio/foley/flashlight_off.wav");
     private AudioStream[] footStepSounds = new AudioStream[]
     {
         (AudioStream)ResourceLoader.Load("res://assets/audio/footsteps/rubber_03.wav"),
@@ -66,10 +77,15 @@ public partial class Player : CharacterBody3D
     public override void _Ready()
     {
         Input.MouseMode = Input.MouseModeEnum.Captured;//Hide and lock the mouse
-		cameraThirdPerson = GetNode<Node3D>("CameraMountThirdPerson");  
+		CameraThirdPerson3D = GetNode<Camera3D>("cameraThirdPersonMount3D/SpringArm3D/CameraThirdPerson3D");  
+		CameraFirstPerson3D = GetNode<Camera3D>("character_default/default_rig/Skeleton3D/BoneAttachment3D/CameraFirstPerson3D"); 
+		cameraThirdPersonMount3D = GetNode<Node3D>("cameraThirdPersonMount3D"); 
+
 		Character = GetNode<Node3D>("character_default");
 		soundPlayerFootsteps = GetNode<AudioStreamPlayer3D>("SoundPlayerFootsteps3D");
 		soundPlayer = GetNode<AudioStreamPlayer3D>("SoundPlayer3D");
+		crosshairLight = GetNode<SpotLight3D>("character_default/default_rig/Skeleton3D/BoneAttachment3D/crosshairLight");
+		flashLight = GetNode<SpotLight3D>("character_default/default_rig/Skeleton3D/BoneAttachment3D/flashLight");
 		AnimationTree = GetNode<AnimationTree>("character_default/AnimationTree");
 		CharacterSkeleton = GetNode<Skeleton3D>("character_default/default_rig/Skeleton3D");
         canJump = true;
@@ -80,8 +96,36 @@ public partial class Player : CharacterBody3D
         if (@event is InputEventMouseMotion mouseMotionEvent)
         {
             RotateY(Mathf.DegToRad(-mouseMotionEvent.Relative.X * (0.25f*mouseSensitivity)));
-            cameraThirdPerson.RotationDegrees = new Vector3(Math.Clamp(cameraThirdPerson.RotationDegrees.X - mouseMotionEvent.Relative.Y * (0.5f*mouseSensitivity),-90,100),0,0);            
+            cameraThirdPersonMount3D.RotationDegrees = new Vector3(Math.Clamp(cameraThirdPersonMount3D.RotationDegrees.X - mouseMotionEvent.Relative.Y * (0.5f*mouseSensitivity),-90,100),0,0);
         }
+
+        if (Input.IsActionJustPressed("jump") && isGrounded && canJump) AnimationTree.Set("parameters/MainStates/conditions/isJumping",true);
+        if (Input.IsActionJustPressed("flashlight")) 
+        {
+            switch(flashLight.LightEnergy)
+            {
+                case 0:     soundPlayer.Stream = flashlightOnSound;
+                            flashLight.LightEnergy = 5;
+                            break;
+                case 10:
+                default:    soundPlayer.Stream = flashlightOffSound;
+                            flashLight.LightEnergy = 0;
+                            break;
+            }
+            soundPlayer.UnitSize = 5f;
+            soundPlayer.Play();            
+        }
+
+        if (Input.IsActionJustPressed("camera")) 
+        {
+            switch(CameraThirdPerson3D.Current)
+            {
+                case true:  CameraThirdPerson3D.Current = false;
+                            break;
+                case false: CameraThirdPerson3D.Current = true;
+                            break;
+            }           
+        }        
     }
 
     public override void _UnhandledInput(InputEvent @event)
@@ -91,13 +135,7 @@ public partial class Player : CharacterBody3D
 
     private void jumpFunction()
     {
-        if(!IsOnFloor()) return;
-
-        int randomjumpsoundIndex = (int)GD.RandRange(0, jumpSounds.Length-1);
-        soundPlayer.Stream = jumpSounds[randomjumpsoundIndex];            
-        soundPlayer.PitchScale = (float)GD.RandRange(1,2);
-        soundPlayer.UnitSize = 0.75f;
-        soundPlayer.Play();
+        if(!IsOnFloor()) return;        
         Vector3 velocity = Velocity;
         velocity.Y = Mathf.Lerp(velocity.Y,jumpForce,0.8f);
         Velocity = velocity;
@@ -124,6 +162,12 @@ public partial class Player : CharacterBody3D
                             soundPlayerFootsteps.UnitSize = 1.5f;
                             soundPlayerFootsteps.Play();
                             break;
+            case "jump":    int randomjumpsoundIndex = (int)GD.RandRange(0, jumpSounds.Length-1);
+                            soundPlayerFootsteps.Stream = jumpSounds[randomjumpsoundIndex];            
+                            soundPlayerFootsteps.PitchScale = (float)GD.RandRange(1,2);
+                            soundPlayerFootsteps.UnitSize = 0.75f;
+                            soundPlayerFootsteps.Play();
+                            break;
 
         }            
     }
@@ -136,16 +180,18 @@ public partial class Player : CharacterBody3D
         //if(!isRunning) targetAngle = 0;
         //Character.Rotation = new Vector3(Character.Rotation.X, Mathf.LerpAngle(Character.Rotation.Y, targetAngle, 0.1f), Character.Rotation.Z);
 
+        Quaternion headBoneQuaternion = CharacterSkeleton.GetBonePoseRotation(5);
+        //Quaternion neckBoneQuaternion = CharacterSkeleton.GetBonePoseRotation(4);
+        //Quaternion spine2BoneQuaternion = CharacterSkeleton.GetBonePoseRotation(3);
+        CharacterSkeleton.SetBonePoseRotation(5, new Quaternion(-cameraThirdPersonMount3D.Rotation.X*0.25f, headBoneQuaternion.Y, headBoneQuaternion.Z, headBoneQuaternion.W));        
+        //CharacterSkeleton.SetBonePoseRotation(4, new Quaternion(-cameraThirdPersonMount3D.Rotation.X*0.1f, neckBoneQuaternion.Y, neckBoneQuaternion.Z, neckBoneQuaternion.W));
+        //CharacterSkeleton.SetBonePoseRotation(3, new Quaternion(-cameraThirdPersonMount3D.Rotation.X*0.1f, neckBoneQuaternion.Y, neckBoneQuaternion.Z, neckBoneQuaternion.W));
+
+
         float LongSpeed = -Transform.Basis.Z.Dot(Velocity);
         float LatSpeed = Transform.Basis.X.Dot(Velocity);
         float LatLongSpeed = (float)Math.Sqrt(Math.Pow(LongSpeed, 2) + Math.Pow(LatSpeed, 2));
         bool isGrounded = IsOnFloor();
-        Quaternion headBoneQuaternion = CharacterSkeleton.GetBonePoseRotation(5);
-        Quaternion neckBoneQuaternion = CharacterSkeleton.GetBonePoseRotation(4);
-        Quaternion spine2BoneQuaternion = CharacterSkeleton.GetBonePoseRotation(3);
-        CharacterSkeleton.SetBonePoseRotation(5, new Quaternion(-cameraThirdPerson.Rotation.X*0.25f, headBoneQuaternion.Y, headBoneQuaternion.Z, headBoneQuaternion.W));        
-        CharacterSkeleton.SetBonePoseRotation(4, new Quaternion(-cameraThirdPerson.Rotation.X*0.1f, neckBoneQuaternion.Y, neckBoneQuaternion.Z, neckBoneQuaternion.W));
-        //CharacterSkeleton.SetBonePoseRotation(3, new Quaternion(-cameraThirdPerson.Rotation.X*0.1f, neckBoneQuaternion.Y, neckBoneQuaternion.Z, neckBoneQuaternion.W));
 
         //Locomotion blending
         Vector2 LocomotionBlend = AnimationTree.Get("parameters/MainStates/Locomotion/blend_position").AsVector2();
@@ -162,21 +208,35 @@ public partial class Player : CharacterBody3D
     private void OnImpact(Vector3 previousVelocity)
     {        
         if (previousVelocity == Vector3.Zero) return;
-    }    
+    }
+
+    public override void _Process(double delta)
+    {
+
+    }
 
     public override void _PhysicsProcess(double delta)
-    {
+    {    
         Vector3 velocity = Velocity;
-        bool isGrounded = IsOnFloor();
+        isGrounded = IsOnFloor();
         previousVelocity = velocity;
         Vector2 inputDir = Input.GetVector("move left", "move right", "move forward", "move backward");
         Vector3 direction = (Transform.Basis * new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
         AnimationTree.Set("parameters/MainStates/conditions/isGrounded",isGrounded);   
 
-        if (Input.IsActionJustPressed("jump") && isGrounded && canJump)
-        AnimationTree.Set("parameters/MainStates/conditions/isJumping",true);
+        switch(Input.IsActionPressed("aim"))
+        {
+            case true:  CameraThirdPerson3D.Fov = Mathf.Lerp(CameraThirdPerson3D.Fov,zoomFOV,lerpSpeed);
+                        CameraFirstPerson3D.Fov = Mathf.Lerp(CameraFirstPerson3D.Fov,zoomFOV,lerpSpeed);
+                        crosshairLight.LightEnergy = 25;
+                        break;
+            case false: CameraThirdPerson3D.Fov = Mathf.Lerp(CameraThirdPerson3D.Fov,FOV,lerpSpeed);
+                        CameraFirstPerson3D.Fov = Mathf.Lerp(CameraFirstPerson3D.Fov,FOV,lerpSpeed);
+                        crosshairLight.LightEnergy = 0;
+                        break;
+        }        
 
-        switch (Input.IsActionPressed("sprint") && Input.IsActionPressed("move forward") && isGrounded)        
+        switch (Input.IsActionPressed("sprint") && Input.IsActionPressed("move forward") && !Input.IsActionPressed("aim") && isGrounded)        
         {
             case true:  currentSpeed = runSpeed;                        
                         isRunning = true;                                                

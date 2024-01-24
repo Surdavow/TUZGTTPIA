@@ -84,7 +84,7 @@ public partial class Player : CharacterBody3D
 		Character = GetNode<Node3D>("character_default");
 		soundPlayerFootsteps = GetNode<AudioStreamPlayer3D>("SoundPlayerFootsteps3D");
 		soundPlayer = GetNode<AudioStreamPlayer3D>("SoundPlayer3D");
-		crosshairLight = GetNode<SpotLight3D>("character_default/default_rig/Skeleton3D/BoneAttachment3D/crosshairLight");
+		crosshairLight = GetNode<SpotLight3D>("cameraThirdPersonMount3D/crosshairLight");
 		flashLight = GetNode<SpotLight3D>("character_default/default_rig/Skeleton3D/BoneAttachment3D/flashLight");
 		AnimationTree = GetNode<AnimationTree>("character_default/AnimationTree");
 		CharacterSkeleton = GetNode<Skeleton3D>("character_default/default_rig/Skeleton3D");
@@ -157,11 +157,17 @@ public partial class Player : CharacterBody3D
                                 }
                                 break;
             case "land":    int randomlandIndex = (int)GD.RandRange(0, footSteplandSounds.Length-1);
-                            soundPlayerFootsteps.Stream = footSteplandSounds[randomlandIndex];            
-                            soundPlayerFootsteps.PitchScale = (float)GD.RandRange(0.75f,1.5f);
-                            soundPlayerFootsteps.UnitSize = 1.5f;
+                            soundPlayerFootsteps.Stream = footSteplandSounds[randomlandIndex];       
+                            soundPlayerFootsteps.PitchScale = (float)GD.RandRange(1.25f,1.75f);
+                            soundPlayerFootsteps.UnitSize = 0.75f;
                             soundPlayerFootsteps.Play();
                             break;
+            case "landhard":    randomlandIndex = (int)GD.RandRange(0, footSteplandSounds.Length-1);
+                                soundPlayerFootsteps.Stream = footSteplandSounds[randomlandIndex];
+                                soundPlayerFootsteps.PitchScale = (float)GD.RandRange(0.75f,1.1f);
+                                soundPlayerFootsteps.UnitSize = 1.5f;
+                                soundPlayerFootsteps.Play();
+                                break;
             case "jump":    int randomjumpsoundIndex = (int)GD.RandRange(0, jumpSounds.Length-1);
                             soundPlayerFootsteps.Stream = jumpSounds[randomjumpsoundIndex];            
                             soundPlayerFootsteps.PitchScale = (float)GD.RandRange(1,2);
@@ -208,11 +214,14 @@ public partial class Player : CharacterBody3D
     private void OnImpact(Vector3 previousVelocity)
     {        
         if (previousVelocity == Vector3.Zero) return;
+        AnimationNodeStateMachinePlayback stateMachine = (AnimationNodeStateMachinePlayback)AnimationTree.Get("parameters/MainStates/playback");
+        if(previousVelocity.Y > -10) stateMachine.Travel("fall_land",false);
+        else stateMachine.Travel("fall_landhard",false);
     }
 
     public override void _Process(double delta)
     {
-
+        
     }
 
     public override void _PhysicsProcess(double delta)

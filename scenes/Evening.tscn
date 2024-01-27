@@ -2,12 +2,12 @@
 
 [ext_resource type="Texture2D" uid="uid://c8arnlq67qi7" path="res://assets/textures/grids/Dark/texture_05.png" id="1_56tvp"]
 [ext_resource type="Texture2D" uid="uid://c2r0yh50fu3wm" path="res://icon.svg" id="2_7ioer"]
-[ext_resource type="AudioStream" uid="uid://bwgl4ok42pf3e" path="res://assets/audio/music/Cold Blue - Astron.mp3" id="3_ik2lj"]
+[ext_resource type="AudioStream" uid="uid://2o5bo6qe5ijh" path="res://assets/audio/music/øneheart_x_reidenshi_-_snowfall.mp3" id="3_8j60w"]
 [ext_resource type="Texture2D" uid="uid://b58xv1joypxo5" path="res://assets/textures/grids/Orange/texture_09.png" id="4_761re"]
 [ext_resource type="Texture2D" uid="uid://hu5rfl6qr2nv" path="res://assets/textures/grids/Red/texture_09.png" id="5_qbc06"]
 [ext_resource type="Texture2D" uid="uid://djg8y25y06h5n" path="res://assets/textures/grids/Green/texture_09.png" id="6_rrbi2"]
 [ext_resource type="Texture2D" uid="uid://cm5m7nr7dugjd" path="res://assets/textures/grids/Purple/texture_09.png" id="7_1s1wr"]
-[ext_resource type="PackedScene" uid="uid://dl8aieroxhs4p" path="res://scenes/Player.tscn" id="8_ywsdb"]
+[ext_resource type="PackedScene" uid="uid://dl8aieroxhs4p" path="res://assets/Player.tscn" id="8_ywsdb"]
 [ext_resource type="PackedScene" uid="uid://cpt1l88mccp05" path="res://assets/models/House.blend" id="9_6y8qe"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_guxnk"]
@@ -93,7 +93,7 @@ metadata/_edit_lock_ = true
 
 [node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="Boxes/Box"]
 transform = Transform3D(1, 0, 7.45058e-08, 0, 1, 0, -7.45058e-08, 0, 1, 0, 0.647503, 0)
-stream = ExtResource("3_ik2lj")
+stream = ExtResource("3_8j60w")
 unit_size = 1.0
 max_db = 1.0
 autoplay = true

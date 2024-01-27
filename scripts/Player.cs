@@ -201,7 +201,7 @@ public partial class Player : CharacterBody3D
 
         //Locomotion blending
         Vector2 LocomotionBlend = AnimationTree.Get("parameters/MainStates/Locomotion/blend_position").AsVector2();
-        AnimationTree.Set("parameters/MainStates/Locomotion/blend_position", new Vector2(Math.Clamp(Mathf.Lerp(LocomotionBlend.X,LatSpeed / runSpeed,0.75f),-1,1),Math.Clamp(Mathf.Lerp(LocomotionBlend.Y,LongSpeed / runSpeed, 0.75f),-1,1)));        
+        AnimationTree.Set("parameters/MainStates/Locomotion/blend_position", new Vector2(Math.Clamp(Mathf.Lerp(LocomotionBlend.X,LatSpeed / runSpeed,0.1f),-1,1),Math.Clamp(Mathf.Lerp(LocomotionBlend.Y,LongSpeed / runSpeed, 0.1f),-1,1)));        
         //Locomotion timescale
         float LocomotionSpeedScale = (float)AnimationTree.Get("parameters/TimeScale/scale");
         if (isGrounded) AnimationTree.Set("parameters/TimeScale/scale",Mathf.Lerp(LocomotionSpeedScale,Math.Clamp(LatLongSpeed / runSpeed, 1, 1000),lerpSpeed * runForce));

@@ -2,12 +2,12 @@
 
 [ext_resource type="Texture2D" uid="uid://c8arnlq67qi7" path="res://assets/textures/grids/Dark/texture_05.png" id="1_xsrvr"]
 [ext_resource type="Texture2D" uid="uid://c2r0yh50fu3wm" path="res://icon.svg" id="2_m32x8"]
-[ext_resource type="AudioStream" uid="uid://c34eehx0yoair" path="res://assets/audio/music/On the Island - Godmode.mp3" id="3_xb25u"]
+[ext_resource type="AudioStream" uid="uid://c34eehx0yoair" path="res://assets/audio/music/on_the_island_-_godmode.mp3" id="3_xb25u"]
 [ext_resource type="Texture2D" uid="uid://b58xv1joypxo5" path="res://assets/textures/grids/Orange/texture_09.png" id="4_qrsc8"]
 [ext_resource type="Texture2D" uid="uid://hu5rfl6qr2nv" path="res://assets/textures/grids/Red/texture_09.png" id="5_oim1g"]
 [ext_resource type="Texture2D" uid="uid://djg8y25y06h5n" path="res://assets/textures/grids/Green/texture_09.png" id="6_pcf8f"]
 [ext_resource type="Texture2D" uid="uid://cm5m7nr7dugjd" path="res://assets/textures/grids/Purple/texture_09.png" id="7_e5xig"]
-[ext_resource type="PackedScene" uid="uid://dl8aieroxhs4p" path="res://scenes/Player.tscn" id="8_i5um4"]
+[ext_resource type="PackedScene" uid="uid://dl8aieroxhs4p" path="res://assets/Player.tscn" id="8_i5um4"]
 [ext_resource type="PackedScene" uid="uid://cpt1l88mccp05" path="res://assets/models/House.blend" id="9_p5bbi"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_guxnk"]

@@ -7,7 +7,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "C:/Users/Elite PC/OneDrive/Productivity/Godot/Godot.exe",
+            "program": "C:/Users/luigi/OneDrive/Documents/Godot/Godot.exe",
             "cwd": "${workspaceFolder}",
             "console": "internalConsole",
             "stopAtEntry": false,

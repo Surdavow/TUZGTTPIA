@@ -1,6 +1,6 @@
 ﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tuzgttpia", "Tuzgttpia.csproj", "{B1358FF8-F5B7-49DD-A1DD-774AAC0F6D69}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tuzgttpia", "Tuzgttpia.csproj", "{57E64ACF-EF18-4270-8388-FA7D186CEFC8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -9,11 +9,11 @@ Global
 	ExportRelease|Any CPU = ExportRelease|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B1358FF8-F5B7-49DD-A1DD-774AAC0F6D69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B1358FF8-F5B7-49DD-A1DD-774AAC0F6D69}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B1358FF8-F5B7-49DD-A1DD-774AAC0F6D69}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
-		{B1358FF8-F5B7-49DD-A1DD-774AAC0F6D69}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
-		{B1358FF8-F5B7-49DD-A1DD-774AAC0F6D69}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
-		{B1358FF8-F5B7-49DD-A1DD-774AAC0F6D69}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+		{57E64ACF-EF18-4270-8388-FA7D186CEFC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57E64ACF-EF18-4270-8388-FA7D186CEFC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57E64ACF-EF18-4270-8388-FA7D186CEFC8}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
+		{57E64ACF-EF18-4270-8388-FA7D186CEFC8}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
+		{57E64ACF-EF18-4270-8388-FA7D186CEFC8}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
+		{57E64ACF-EF18-4270-8388-FA7D186CEFC8}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
 	EndGlobalSection
 EndGlobal
